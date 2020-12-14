@@ -29,6 +29,7 @@ const DateRangePicker = ({
   date,
   maxDate,
   range,
+  boldDates,
   dayHeaderTextStyle,
   dayHeaderStyle,
   backdropStyle,
@@ -58,6 +59,14 @@ const DateRangePicker = ({
   const [selecting, setSelecting] = useState(false);
   const [dayHeaders, setDayHeaders] = useState([]);
   const _moment = moment || momentDefault;
+  const _boldDates = boldDates || new Map();
+  const _boldDatesInDisplayedYear = _boldDates.get(displayedDate.year()) || new Map();
+  const _boldDaysInDisplayedMonth = _boldDatesInDisplayedYear.get(displayedDate.month() + 1) || new Map();
+  console.log('[DateRangePicker][displayedDate]', displayedDate)
+  console.log('[DateRangePicker][boldDates]', boldDates)
+  console.log('[DateRangePicker][_boldDatesInDisplayedYear]', _boldDatesInDisplayedYear)
+  console.log('[DateRangePicker][_boldDaysInDisplayedMonth]', _boldDaysInDisplayedMonth)
+  
   const mergedStyles = {
     backdrop: {
       ...styles.backdrop,
@@ -126,6 +135,13 @@ const DateRangePicker = ({
       (_minDate && _date.isBefore(_minDate, "day")) ||
       (_maxDate && _date.isAfter(_maxDate, "day"))
     );
+  }, []);
+
+  const isBold = useCallback((_dayInMonth, _boldDaysInMonth) => {
+    console.log('[DateRangePicker][isBold]', _dayInMonth, _boldDaysInMonth, _boldDaysInMonth.has(_dayInMonth))
+    return (
+        _boldDaysInMonth.has(_dayInMonth)
+    )
   }, []);
 
   const today = () => {
@@ -234,6 +250,7 @@ const DateRangePicker = ({
         let _date = _moment(displayedDate).set("date", i);
         let _selected = selected(_date, startDate, endDate, date);
         let _disabled = disabled(_date, minDate, maxDate);
+        let _isBold = isBold(i, _boldDaysInDisplayedMonth);
         week.push(
           <Day
             key={`day-${i}`}
@@ -246,6 +263,7 @@ const DateRangePicker = ({
             index={i}
             selected={_selected}
             disabled={_disabled}
+            isBold={_isBold}
             select={select}
           />
         );
@@ -280,6 +298,7 @@ const DateRangePicker = ({
     date,
     _moment,
     displayedDate,
+    boldDates,
     dayHeaderTextStyle,
     dayHeaderStyle,
     selected,
@@ -420,7 +439,8 @@ DateRangePicker.defaultProps = {
   buttons: false,
   presetButtons: false,
   isOpenModal: false,
-  customStyles: {}
+  customStyles: {},
+  boldDates: new Map()
 };
 
 DateRangePicker.propTypes = {
@@ -432,6 +452,7 @@ DateRangePicker.propTypes = {
   displayedDate: PropTypes.object,
   minDate: PropTypes.object,
   maxDate: PropTypes.object,
+  boldDates: PropTypes.instanceOf(Map),
   backdropStyle: PropTypes.object,
   containerStyle: PropTypes.object,
   headerTextStyle: PropTypes.object,

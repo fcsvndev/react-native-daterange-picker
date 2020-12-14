@@ -6,6 +6,7 @@ const Day = ({
   index,
   selected,
   disabled,
+  isBold,
   select,
   selectedStyle,
   selectedTextStyle,
@@ -13,6 +14,7 @@ const Day = ({
   dayStyle,
   dayTextStyle,
   disabledTextStyle,
+  boldTextStyle,
   empty,
 }) => {
   const selectThis = () => {
@@ -44,6 +46,10 @@ const Day = ({
     ...styles.selectedText,
     ...selectedTextStyle,
   };
+  const boldTextStyles = {
+    ...styles.boldText,
+    ...boldTextStyle,
+  };
   return (
     <TouchableOpacity key={"day-" + index} onPress={empty ? null : selectThis}>
       <View style={styles.day}>
@@ -57,8 +63,9 @@ const Day = ({
           <Text
             style={{
               ...dayTextStyles,
+              ...(isBold && boldTextStyles),
               ...(selected && selectedTextStyles),
-              ...(disabled && disabledTextStyles),
+              ...(disabled && disabledTextStyles)
             }}
           >
             {index}
@@ -94,6 +101,9 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     opacity: 0.3,
+  },
+  boldText: {
+    fontWeight: 'bold'
   },
   disabled: {},
 });
